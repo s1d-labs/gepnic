@@ -1,0 +1,12 @@
+{
+  "family": "gepnic",
+  "about": "Every portal running NIC's GePNIC software (state, PSU and central portals): counted, then crawled with documents.",
+  "setup": [
+    "pip install -r requirements.txt",
+    "pip install torch --index-url https://download.pytorch.org/whl/cpu"
+  ],
+  "tasks": {
+    "crawl": ["python", "pool_task.py", "crawl"],
+    "count": ["python", "pool_task.py", "count"]
+  }
+}

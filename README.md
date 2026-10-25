@@ -1,4 +1,20 @@
-# eprocure-scrape
+# gepnic: the GePNIC family of s1d-labs
+
+Everything specific to GePNIC portals lives here: the crawler, its pool settings, and (soon) its own web app and jobs. The hub
+([s1d-labs/scrape-hub](https://github.com/s1d-labs/scrape-hub)) is generic: it runs the pool, signs uploads, tracks runners, IPs,
+requests and hosts, and knows nothing about tenders.
+
+- `scrape.json`: how the pool runs this family (setup steps and one command per task). The generic worker in
+  [s1d-labs/runner](https://github.com/s1d-labs/runner) checks this repo out at `main` for every pooled run.
+- `pool_task.py`: the pool's entry point (checks the portal, then starts `crawl.py` or `count.py`).
+- `pool_settings.py`: writes each project's pool settings (task, target, env, probe) to the hub.
+- `.github/workflows/gepnic-*.yml`: the manual workflows (plan, crawl, backfill, consolidate, portals).
+
+Owner: sarthak (the gepnic family owner on scrape.s1d.me).
+
+---
+
+## History: eprocure-scrape
 
 Scrapes tenders from [eprocure.gov.in](https://eprocure.gov.in) (GePNIC), 2011 to 2026, in GitHub Actions and reports to
 [scrape-hub](https://github.com/Sarthak-Sidhant/scrape-hub), which stores the records in Postgres and shows the live dashboard
