@@ -1,0 +1,29 @@
+# Operator scripts for the hub host
+
+One-off helpers written while running the eprocure scrape. They read the hub database through `DATABASE_URL`, so run them as the hub's
+user with its environment, from `/opt/gepnic`:
+
+```bash
+sudo cp jobs/ops/state.py /opt/gepnic/_state.py
+sudo -u scrapehub bash -c 'set -a; . /etc/scrape-hub/env; set +a; cd /opt/gepnic && .venv/bin/python _state.py'
+```
+
+| Script | What it prints or does |
+|---|---|
+| `state.py` | Records, queue by status (tenders and sections), speed settings, running runs, latest probe, failures |
+| `analyze_run.py <gh_run_id> <procs per runner>` | Per-runner tenders/min, CPU, phase times, captcha and refusal counts for one workflow run |
+| `phase_breakdown.py` | Seconds per tender by phase (list, fetch, docs, upload, parse), captcha attempts per tender |
+| `window_coverage.py` | For pending/failed windows: how many tenders are already stored vs expected |
+| `queue_by_size.py` | Queue status by window size, and time per window |
+| `document_counts.py` | Document files stored/refused/failed, by kind and type; tenders with at least one file |
+| `refused_by_year.py`, `refused_by_month.py` | Where the portal refuses documents (by tender year, by publication month) |
+| `ip_report.py` | Runner IPs by hub calls, tenders and uploaded GB |
+| `sections_quality.py`, `missing_sections.py` | Checks on the parsed document lists (counts, tenders still missing them) |
+| `seed_sections_backfill.py` | Creates the `eprocure-sections` project and one queue item per (year, organisation) |
+| `reseed_incomplete_sections.py` | Puts org-years that still have tenders without sections back to pending |
+| `reset_windows_with_stale_pages.py` | Puts windows holding "session expired" / "Stale Session" captures back to pending |
+| `tender_index.sql` | Rebuilds the lookup tables `eprocure.tender_index` (one row per tender), `eprocure.file_index` (one row per document file) and `eprocure.org_index` (which organisation id and code own which tenders, with the R2 path pattern). Run with `sudo -u postgres psql -d scrape_hub -f jobs/ops/tender_index.sql` (about 12 minutes, replaces both tables in one transaction) |
+| `bid_index.py init\|build\|refresh\|search <name>` | Who bid on which tender and who won, across every tender project: `eprocure.bid_index` (one row per bid, flags bid/winner/L1, awarded value), `eprocure.bidders` (one row per normalised name), `eprocure.bidder_stats`. Run as postgres from `/opt/gepnic`: `sudo -u postgres .venv/bin/python jobs/ops/bid_index.py search emudhra`. The full build reads all of `records` in gentle batches (about 7 h for 15.7M records, resumable with `build --resume`); `scrape-hub-bid-index.timer` refreshes nightly from the `records_scraped_at` index |
+| `set_threads.py <n>` | Sets the speed (threads per process) for `eprocure-tenders` (edit the name inside for another project) |
+
+Always read a script before running it: some of them change the queue or settings.

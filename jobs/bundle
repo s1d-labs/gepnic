@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Tender bundles from a shell on the VPS: runs jobs/bundlectl.py as the gepnic app's user with its environment (nothing secret is read here).
+# Install: cp jobs/bundle ~/bin/bundle. Usage: bundle --help
+exec sudo -n systemd-run --quiet --pipe --wait --collect --uid=gepnic --gid=gepnic \
+  -p EnvironmentFile=/etc/gepnic-app/env -p WorkingDirectory=/opt/gepnic \
+  /opt/gepnic/.venv/bin/python jobs/bundlectl.py "$@"

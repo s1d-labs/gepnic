@@ -7,7 +7,18 @@ requests and hosts, and knows nothing about tenders.
 - `scrape.json`: how the pool runs this family (setup steps and one command per task). The generic worker in
   [s1d-labs/runner](https://github.com/s1d-labs/runner) checks this repo out at `main` for every pooled run.
 - `pool_task.py`: the pool's entry point (checks the portal, then starts `crawl.py` or `count.py`).
-- `pool_settings.py`: writes each project's pool settings (task, target, env, probe) to the hub.
+- `pool_settings.py`: each project's pool settings (task, target, env, probe) for the hub.
+- `probe_settings.py`: the health checks the hub runs for GePNIC (`POST /api/families/gepnic/probes`).
+- `app/`: the GePNIC app (`gepnic_app`, FastAPI): the pages under `/gepnic/` (overview, portals, data and quality, tender lookup,
+  bundles, throttle, journal), the public `/bundle/<slug>.zip` links, and the crawler's runner extras (`known-records`,
+  `window-stored`, `backfill/todo`, `patch-records`). It runs as its own service behind scrape-hub, which forwards to it and signs who
+  is asking (s1d-labs/scrape-hub `docs/family-apps.md`). `app/schema.sql` = GePNIC's own tables in the scrape_hub database.
+  Tests: `cd app && python -m pytest tests` (needs `pgserver`). Deployed on dev-vps-2 by `~/setup/79-gepnic-app.sh` (127.0.0.1:9332).
+- `jobs/`: GePNIC's batch jobs: tender bundles (`bundler.py`, `bundlectl.py`, `bundle`), the data and quality numbers
+  (`build_showcase.py`, `build_quality.py`, `ops/*.sql`), the bid index (`ops/bid_index.py`), the portal capacity ramp (`ramp.py`),
+  queue balancing (`bucket_queue.py`) and one-off ops scripts (`ops/`).
+- `deploy/`: units for those jobs (`gepnic-*.service/.timer`, not installed: nightly rebuilds are off) and the B2 relay worker.
+- `data/gepnic_portals.json`: the portal registry (one copy, used by the crawler, the app and the jobs).
 - `.github/workflows/gepnic-*.yml`: the manual workflows (plan, crawl, backfill, consolidate, portals).
 
 Owner: sarthak (the gepnic family owner on scrape.s1d.me).

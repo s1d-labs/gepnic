@@ -1,0 +1,17 @@
+[Unit]
+Description=Rebuild the tender facts table and the numbers behind the /gepnic/data page
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=gepnic
+WorkingDirectory=/opt/gepnic
+EnvironmentFile=/etc/gepnic-app/env
+# the index and facts tables live in the postgres-owned eprocure schema; "+" runs this step as root, which hands it to postgres
+# the nightly backup's snapshot blocks DROP TABLE until it ends (2026-10-21: it ran 03:34-06:06 and this job timed out waiting): wait it out
+ExecStartPre=/bin/sh -c 'while systemctl is-active --quiet scrape-hub-backup.service; do sleep 60; done'
+ExecStartPre=+/usr/sbin/runuser -u postgres -- psql -d scrape_hub -v ON_ERROR_STOP=1 -q -f /opt/gepnic/jobs/ops/tender_index.sql
+ExecStartPre=+/usr/sbin/runuser -u postgres -- psql -d scrape_hub -v ON_ERROR_STOP=1 -q -f /opt/gepnic/jobs/ops/tender_facts.sql
+ExecStart=/opt/gepnic/.venv/bin/python jobs/build_showcase.py
+TimeoutStartSec=6h
+NoNewPrivileges=true

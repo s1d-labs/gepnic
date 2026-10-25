@@ -1,0 +1,15 @@
+[Unit]
+Description=Refresh the bid index (eprocure.bid_index, bidders, bidder_stats) for tenders scraped since the last run
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=postgres
+WorkingDirectory=/opt/gepnic
+ExecStartPre=/bin/sh -c 'while systemctl is-active --quiet scrape-hub-backup.service; do sleep 60; done'
+ExecStart=/opt/gepnic/.venv/bin/python -I jobs/ops/bid_index.py refresh
+TimeoutStartSec=4h
+Nice=10
+IOSchedulingClass=idle
+MemoryMax=2G
+NoNewPrivileges=true
