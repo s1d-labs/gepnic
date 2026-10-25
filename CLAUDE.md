@@ -22,13 +22,13 @@ home.s1d.me → Docs → Scraper guide. This file covers what is particular to G
 | `jobs/`, `deploy/` | GePNIC's own batch jobs (bundles, showcase, quality, capacity ramp, ops scripts) and their units; not installed (owner: nightly rebuilds off) |
 | `.github/workflows/gepnic-*.yml` | manual workflows (plan, crawl, consolidate, backfill, portals, plan new tenders) |
 
-## Rules that matter here
+## Things to know
 
 - **Organisation ids shift.** The portals renumber organisations when new ones are added. Queue items carry the id and label at
   seed time; `crawl.py` refuses a window whose id now points elsewhere ("reseed needed"). Re-plan from today's dropdown instead of
   patching ids.
 - **Skip what is stored.** `crawl.py` asks `hub.window_stored` (whole window complete?) and `hub.known` (which tender ids are stored)
-  before fetching; both go through the hub to the GePNIC app. Keep that, or reruns re-download everything.
+  before fetching; both go through the hub to the GePNIC app. Without them reruns re-download everything.
 - **Captchas** are solved by the CNN in `captcha/` (torch CPU wheel, installed by `scrape.json` setup). Sessions expire; `crawl.py`
   re-logs in and counts `sessions_new` / `sessions_renewed`.
 - **Politeness** is the hub's: per-portal worker caps, health checks `gepnic:<portal>` (a portal that is down holds its work), and
@@ -36,6 +36,6 @@ home.s1d.me → Docs → Scraper guide. This file covers what is particular to G
 - **eprocure.gov.in** (CPPP) is the legacy portal: planned from saved yearly counts (`plan.py` without PORTAL), its own project names.
   GePNIC 2.0 portals (`ui: gepnic2`, e.g. Manipur) are not supported by this crawler.
 - **Files**: tender pages and documents go to the hub's buckets (`settings.storage` b2/r2 per project; the family keeps the legacy
-  buckets). Never add storage keys or tokens to this repo.
-- The family owner is sarthak. Changes to crawl/count behaviour affect live crawls of government sites: test with `--max-items`,
-  `--max-tenders` and one portal first.
+  buckets) through signed upload links, so the (public) repo needs no storage keys.
+- The family owner is sarthak. Changes to crawl/count behaviour affect live crawls; `--max-items`, `--max-tenders` and a single
+  portal make quick trials.
