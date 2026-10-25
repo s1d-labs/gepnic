@@ -1,6 +1,7 @@
 name: plan new tenders
 
-# Queues counts for tenders published since the last crawl, on every GePNIC portal (plan_new.py), so the pool has work. Seeding
+# Queues counts for tenders published since the last crawl, on every GePNIC portal except eprocure.gov.in and its parked ePublish
+# (plan_new.py), so the pool has work. Seeding
 # only: the hub's pool runs the counts and crawls (when its switch is on), within each portal's limits. Re-running is safe.
 on:
   workflow_dispatch:
@@ -42,7 +43,7 @@ jobs:
           reg = json.load(open("data/gepnic_portals.json"))["portals"]
           want = {p.strip() for p in os.environ.get("PORTALS", "").split(",") if p.strip()}
           for p in reg:
-              if p["portal"] == "eprocure.gov.in" or p.get("ui") == "gepnic2" or (want and p["portal"] not in want):
+              if p["portal"].startswith("eprocure.gov.in") or p.get("ui") == "gepnic2" or (want and p["portal"] not in want):
                   continue
               print(p["portal"])
           PY
