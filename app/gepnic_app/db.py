@@ -37,6 +37,10 @@ def init_schema():
     import psycopg
     sql = SCHEMA.read_text()
     digest = hashlib.sha256(sql.encode()).hexdigest()
+    with conn() as c:     # already applied (e.g. by the owner at deploy time): no DDL, so a role without CREATE rights starts fine
+        if c.execute("SELECT to_regclass('gepnic_schema_applied') AS t").fetchone()["t"] and \
+                c.execute("SELECT 1 FROM gepnic_schema_applied WHERE digest=%s", (digest,)).fetchone():
+            return
     for attempt in range(8):
         try:
             with conn() as c:
