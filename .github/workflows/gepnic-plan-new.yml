@@ -1,0 +1,54 @@
+name: plan new tenders
+
+# Queues counts for tenders published since the last crawl, on every GePNIC portal (plan_new.py), so the pool has work. Seeding
+# only: the hub's pool runs the counts and crawls (when its switch is on), within each portal's limits. Re-running is safe.
+on:
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Start of the window, DD/MM/YYYY"
+        default: "17/10/2026"
+      portals:
+        description: "Comma-separated portals (empty = all)"
+        default: ""
+      dry_run:
+        description: "Only print what would be queued"
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q requests beautifulsoup4 lxml "scrape-hub-client @ git+https://github.com/s1d-labs/runner@main#subdirectory=sdk"
+      - name: Plan
+        env:
+          SINCE: ${{ inputs.since }}
+          PORTALS: ${{ inputs.portals }}
+          DRY: ${{ inputs.dry_run }}
+          SCRAPE_HUB_URL: https://scrape.s1d.me
+        run: |
+          python3 - <<'PY' > portals.txt
+          import json, os
+          reg = json.load(open("data/gepnic_portals.json"))["portals"]
+          want = {p.strip() for p in os.environ.get("PORTALS", "").split(",") if p.strip()}
+          for p in reg:
+              if p["portal"] == "eprocure.gov.in" or p.get("ui") == "gepnic2" or (want and p["portal"] not in want):
+                  continue
+              print(p["portal"])
+          PY
+          fail=0
+          while read -r p; do
+            PORTAL="$p" python plan_new.py --since "$SINCE" $([ "$DRY" = true ] && echo --dry-run) || { echo "::warning::$p failed"; fail=$((fail+1)); }
+            sleep 2
+          done < portals.txt
+          echo "portals that failed: $fail"
