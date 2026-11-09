@@ -32,7 +32,7 @@ def _iso(v):
 
 
 def _counts_loop():
-    """Keep record_counts fresh (the overview's per-project record counts): one worker at a time, at most every SLOW_COUNTS_S (30 min)."""
+    """Keep record_counts fresh (the overview's per-project record counts): one worker at a time, at most every SLOW_COUNTS_S (6 h)."""
     while True:
         try:
             with db.conn() as c:

@@ -47,7 +47,7 @@ FAMILIES = {
 # families whose early records were saved without documents (being redone); their progress counts only records that have them
 DOCS_SINCE = {"gepnic": "2026-10-19 20:31:00+00"}
 CACHE_S = 15
-SLOW_COUNTS_S = 1800       # each recount reads the whole records table (21 GB, 2+ min): every 2 min meant scanning it nonstop
+SLOW_COUNTS_S = 21600      # each recount reads the whole records table (now 6-8 min under load); GePNIC collects nothing new, so every 6 h
 _cache = {"at": 0.0, "data": None}
 _slow = {"at": 0.0, "records": {}, "missing_docs": {}}
 
