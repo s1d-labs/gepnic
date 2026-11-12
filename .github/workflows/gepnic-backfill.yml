@@ -41,7 +41,7 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         if: ${{ matrix.job_index < fromJSON(inputs.total_jobs) }}
-        run: pip install requests beautifulsoup4 "scrape-hub-client @ git+https://github.com/s1d-labs/runner@main#subdirectory=sdk"
+        run: pip install requests beautifulsoup4 "scrape-hub-client @ git+https://github.com/s1d-labs/runner@sdk-stable#subdirectory=sdk"
       - name: Parse the saved pages
         if: ${{ matrix.job_index < fromJSON(inputs.total_jobs) }}
         env:

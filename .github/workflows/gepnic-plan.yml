@@ -48,7 +48,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - run: pip install requests beautifulsoup4 lxml "scrape-hub-client @ git+https://github.com/s1d-labs/runner@main#subdirectory=sdk"
+      - run: pip install requests beautifulsoup4 lxml "scrape-hub-client @ git+https://github.com/s1d-labs/runner@sdk-stable#subdirectory=sdk"
       - run: python plan.py --from-year ${{ inputs.from_year }} --to-year ${{ inputs.to_year }} --split-over ${{ inputs.split_over }} --chunk-max ${{ inputs.chunk_max }}
 
   count:
@@ -69,7 +69,7 @@ jobs:
       - name: Install dependencies
         if: ${{ matrix.job_index < fromJSON(inputs.total_jobs) }}
         run: |
-          pip install -r requirements.txt "scrape-hub-client @ git+https://github.com/s1d-labs/runner@main#subdirectory=sdk"
+          pip install -r requirements.txt "scrape-hub-client @ git+https://github.com/s1d-labs/runner@sdk-stable#subdirectory=sdk"
           pip install torch --index-url https://download.pytorch.org/whl/cpu
       - name: Count windows
         if: ${{ matrix.job_index < fromJSON(inputs.total_jobs) }}

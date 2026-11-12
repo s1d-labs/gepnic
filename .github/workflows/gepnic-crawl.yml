@@ -60,7 +60,7 @@ jobs:
       - name: Install dependencies
         if: ${{ matrix.job_index < fromJSON(inputs.total_jobs) }}
         run: |
-          pip install -r requirements.txt "scrape-hub-client @ git+https://github.com/s1d-labs/runner@main#subdirectory=sdk"
+          pip install -r requirements.txt "scrape-hub-client @ git+https://github.com/s1d-labs/runner@sdk-stable#subdirectory=sdk"
           pip install torch --index-url https://download.pytorch.org/whl/cpu
       - name: Scrape windows
         if: ${{ matrix.job_index < fromJSON(inputs.total_jobs) }}
@@ -101,7 +101,7 @@ jobs:
       - name: Count the windows still waiting
         id: left
         run: |
-          pip install -q "scrape-hub-client @ git+https://github.com/s1d-labs/runner@main#subdirectory=sdk"
+          pip install -q "scrape-hub-client @ git+https://github.com/s1d-labs/runner@sdk-stable#subdirectory=sdk"
           echo "n=$(python remaining.py "${{ inputs.project || 'eprocure-tenders' }}")" >> "$GITHUB_OUTPUT"
       - name: Start the next run
         if: ${{ steps.left.outputs.n != '0' }}
