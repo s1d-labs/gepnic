@@ -4,3 +4,5 @@
 __pycache__/
 .pytest_cache/
 .venv/
+.scrape-check/
+.DS_Store
