@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SCRIPTS = {"crawl": "crawl.py", "count": "count.py"}
+SCRIPTS = {"crawl": "crawl.py", "count": "count.py", "open": "open_tenders.py"}
 
 
 def main(argv):

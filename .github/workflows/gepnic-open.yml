@@ -1,0 +1,38 @@
+name: open road tenders
+
+# Queues today's poll of open tenders on the GePNIC portals in open_setup.py ENABLED (or the portals given by hand). The pool then runs open_tenders.py: the poll
+# lists every organisation's active tenders and queues the road-like ones not seen before; each tender's page is stored once while the
+# tender is open. Run by hand with setup=true after adding portals (registers the gepnic-<slug>-open projects and their pool settings).
+# The hub trusts this repo through the GitHub OIDC token; no secrets are needed.
+on:
+  schedule:
+    - cron: "47 14 * * *"       # 20:17 IST, after the day's publishing
+  workflow_dispatch:
+    inputs:
+      portals:
+        description: "Comma-separated portals (empty = ENABLED in open_setup.py, all = every state and UT portal)"
+        default: ""
+      setup:
+        description: "Also register the projects and write their pool settings"
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -q "scrape-hub-client @ git+https://github.com/s1d-labs/runner@sdk-stable#subdirectory=sdk"
+      - run: python open_setup.py --portals "$PORTALS" $([ "$SETUP" = true ] && echo --setup)
+        env:
+          PORTALS: ${{ inputs.portals }}
+          SETUP: ${{ inputs.setup }}
+          SCRAPE_HUB_URL: https://scrape.s1d.me

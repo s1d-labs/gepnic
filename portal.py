@@ -41,6 +41,7 @@ SEARCH_URL = APP + "?page=WebTenderStatusLists&service=page"
 TITLE = _P["title"]
 TENDERS = "eprocure-tenders" if LEGACY else f"gepnic-{slug(NAME)}"
 PLAN = "eprocure-plan" if LEGACY else f"gepnic-{slug(NAME)}-plan"
+OPEN = "eprocure-open" if LEGACY else f"gepnic-{slug(NAME)}-open"   # open tenders captured while open (open_tenders.py)
 PROBE = "eprocure" if LEGACY else f"gepnic:{NAME}"   # the hub's uptime check for this portal; runners hold while it fails
 MIN_ORGS = 500 if LEGACY else 1                      # sanity check on the organisation dropdown
 # Portals whose certificate chain fails to verify from GitHub's runners ("self-signed certificate in certificate chain"), though it

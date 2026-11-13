@@ -7,6 +7,7 @@
   ],
   "tasks": {
     "crawl": ["python", "pool_task.py", "crawl"],
-    "count": ["python", "pool_task.py", "count"]
+    "count": ["python", "pool_task.py", "count"],
+    "open": ["python", "pool_task.py", "open"]
   }
 }
